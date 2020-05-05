@@ -7,7 +7,8 @@ const ctx = canvas.getContext('2d');
 canvas.width = 1240;
 canvas.height = 740;
 
-var c1 = new circle(canvas.width/2, canvas.height/2, 20, 10, 4);
+let c1 = new circle(canvas.width/2, canvas.height/2, 20, 0, 0);
+let gravity = -0.5;
 
 
 
@@ -26,14 +27,19 @@ function circle(x, y , radius, dx, dy){
 function drawCircle(circle){
     ctx.beginPath();
     ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI*2, true);
-    ctx.fill(); 
-    circle.x = circle.x + circle.dx;
-    circle.y = circle.y + circle.dy;
-
+    ctx.fill();
     if (circle.x + circle.radius >= canvas.width || circle.x - circle.radius <= 0)
-        circle.dx *= -1 ;
-    if (circle.y + circle.radius >= canvas.height || circle.y - circle.radius <= 0)
-        circle.dy *= -1 ;
+        circle.dx *= -1;
+    if (circle.y + circle.radius >= canvas.height || circle.y - circle.radius <= 0){
+        circle.dy *= -1;
+    } 
+    circle.dy -= gravity;
+    circle.x += circle.dx;
+    circle.y += circle.dy;
+   
+    
+
+    
 
 }
 
