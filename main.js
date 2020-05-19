@@ -31,6 +31,10 @@ function getInput(){
    numCircs = inputNum;
 }
 
+function drawManyCircles(cirArr){
+    
+}
+
 
 function drawCircle(circle){
     ctx.beginPath();
