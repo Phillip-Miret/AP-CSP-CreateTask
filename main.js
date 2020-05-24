@@ -8,9 +8,9 @@ canvas.width = 1240;
 canvas.height = 700;
 
 let numCircs = new Number();
-numCircs = 500;
+numCircs = 1000;
 let circles = new Array(numCircs);
-let maxSpeed = 10;
+let maxSpeed = 5;
 let normRadius = 5;
 let gravity = 0;
 
@@ -20,12 +20,14 @@ setInterval(draw, 20);
 
 
 
-function circle(x, y , radius, dx, dy){
+function circle(x, y , radius, dx, dy, infected, immune){
    this.x = x;
    this.y = y;
    this.radius = radius;
    this.dx = dx;
    this.dy = dy;
+   this.infected = false;
+   this.immune = false;
 }
 
 function getInput(){
@@ -41,8 +43,8 @@ function fillCircArr(cirArr){
       cirArr[i] = new circle(Math.random()*canvas.width, 
       Math.random()*canvas.height, 
       normRadius, 
-      Math.random()*maxSpeed, 
-      Math.random()*maxSpeed);
+      Math.random()*maxSpeed*2-maxSpeed, 
+      Math.random()*maxSpeed*2-maxSpeed);
       
     };
 }
@@ -68,27 +70,6 @@ function drawManyCircles(cirArr){
     }
 }
 
-
-function drawCircle(circle){
-    ctx.beginPath();
-    ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI*2, true);
-    ctx.fill();
-    if (circle.x + circle.radius >= canvas.width || circle.x - circle.radius <= 0)
-        circle.dx *= -1;
-    if (circle.y + circle.radius >= canvas.height){ 
-        circle. y = canvas.height - circle.radius;
-        circle.dy *= -1;
-        circle.dy += gravity;      
-    } 
-    circle.dy -= gravity;
-    circle.x += circle.dx;
-    circle.y += circle.dy;
-   
-    
-
-    
-
-}
 
 function draw(){
     ctx.clearRect(0,0,canvas.width, canvas.height);
