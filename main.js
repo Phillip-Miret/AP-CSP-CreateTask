@@ -8,12 +8,17 @@ canvas.width = 1240;
 canvas.height = 700;
 
 let numCircs = new Number();
-let circles = new Array[numCircs];
-let gravity = -0.5;
+numCircs = 500;
+let circles = new Array(numCircs);
+let maxSpeed = 10;
+let normRadius = 5;
+let gravity = 0;
 
-
+fillCircArr(circles);
 
 setInterval(draw, 20);
+
+
 
 function circle(x, y , radius, dx, dy){
    this.x = x;
@@ -31,8 +36,36 @@ function getInput(){
    numCircs = inputNum;
 }
 
+function fillCircArr(cirArr){
+  for(let i = 0; i< cirArr.length; i++){
+      cirArr[i] = new circle(Math.random()*canvas.width, 
+      Math.random()*canvas.height, 
+      normRadius, 
+      Math.random()*maxSpeed, 
+      Math.random()*maxSpeed);
+      
+    };
+}
+
 function drawManyCircles(cirArr){
-    
+    for(let i = 0; i< cirArr.length; i++){
+        ctx.beginPath();
+        ctx.arc(cirArr[i].x, cirArr[i].y, cirArr[i].radius, 0, Math.PI*2, true);
+        ctx.fill(); 
+        if (cirArr[i].x + cirArr[i].radius >= canvas.width || cirArr[i].x - cirArr[i].radius <= 0)
+        cirArr[i].dx *= -1;
+    if (cirArr[i].y + cirArr[i].radius >= canvas.height){ 
+        cirArr[i]. y = canvas.height - cirArr[i].radius;
+        cirArr[i].dy *= -1;
+        cirArr[i].dy += gravity;      
+    } 
+    if(cirArr[i].y <= 0){
+        cirArr[i].dy *= -1;
+    }
+    cirArr[i].dy -= gravity;
+    cirArr[i].x += cirArr[i].dx;
+    cirArr[i].y += cirArr[i].dy;
+    }
 }
 
 
@@ -59,7 +92,7 @@ function drawCircle(circle){
 
 function draw(){
     ctx.clearRect(0,0,canvas.width, canvas.height);
-    drawCircle(c1);
+    drawManyCircles(circles);
 
 }
 
