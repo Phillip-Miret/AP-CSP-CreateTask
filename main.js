@@ -231,21 +231,15 @@ function draw(){
     ctx.font = "30px Arial";
     ctx.fillStyle = "green";
     ctx.fillText("Number alive: " + numAlive, 20, 30);
-    // ctx.font = "30px Arial";
-    // ctx.fillStyle = "green";
+  
     ctx.fillText("Number Infected: " + infectedArr.length, 20, 30*2);
-    // ctx.font = "30px Arial";
-    // ctx.fillStyle = "green";
+    
     ctx.fillText("Number unInfected: " + (circles.length - infectedArr.length - numImmune), 20, 30*3);
-    // ctx.font = "30px Arial";
-    // ctx.fillStyle = "green";
+   
     ctx.fillText("Number Immune: " + numImmune, 20, 30*4);
-    // ctx.font = "30px Arial";
-    // ctx.fillStyle = "green";
+    
     ctx.fillText("Number Dead: " + numDead, 20, 30*5);
-    // ctx.font = "30px Arial";
-    // ctx.fillStyle = "green";
-    // ctx.fillText("R Naught: "  + 5 , 20, 30*6);
+   
 
 }
 
