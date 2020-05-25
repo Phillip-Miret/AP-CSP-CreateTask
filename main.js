@@ -7,19 +7,26 @@ const ctx = canvas.getContext('2d');
 canvas.width = 1240;
 canvas.height = 700;
 
-let numCircs = new Number();
-numCircs = 20;
-let circles = new Array(numCircs);
+let numCircs;
+let circles; 
 let maxSpeed = 5;
 let normRadius = 10;
-//let gravity = 0;
-let chanceOfInfec = 0.1;
-let deathRate = 0.05;
-let timeTillHeal = 500;
+let chanceOfInfec;
+let deathRate;
+let timeTillHeal;
+let step = 0;
 
-fillCircArr(circles);
+let numAlive;
+let numInfected = 1;
+let numImmune = 0;
+let numDead = 0;
+let numHealthy;
 
-setInterval(draw, 20);
+let infectedArr = [];
+
+
+
+
 
 
 
@@ -33,14 +40,39 @@ function circle(x, y , radius, dx, dy, infected, immune, dead, timeTillHeal){
    this.immune = immune;
     this.dead = dead;
     this.timeTillHeal = timeTillHeal;
+    
 }
 
 function getInput(){
     let input = document.getElementById("numInput").value;
-   console.log(input);
-   let inputNum = input.match(/\d+/g);
-   inputNum = parseInt(inputNum[0]);
+   let inputNum = parseFloat(input);
+   console.log(inputNum);
+   if(step === 0){
    numCircs = inputNum;
+   numAlive = inputNum;
+   numHealthy = inputNum - 1;
+   circles = new Array(numCircs); 
+   document.getElementById("message").innerHTML = "Enter the Chance of Infection (ex 0.02)";
+   step++;
+   document.getElementById("numInput").value = "";
+   } else if(step === 1){
+    chanceOfInfec = inputNum;
+    document.getElementById("message").innerHTML = "Enter the death rate (ex 0.06)";
+    step++;
+    document.getElementById("numInput").value = "";
+   }else if(step === 2){
+    deathRate = inputNum;
+    document.getElementById("message").innerHTML = "Enter the time till cured (sec)";
+    step++;
+    document.getElementById("numInput").value = "";
+   }else {
+    timeTillHeal = inputNum * 50;
+    document.getElementById("message").innerHTML = "watch the outcome";
+    document.getElementById("numInput").value = "";
+    fillCircArr(circles);
+    setInterval(draw, 20);
+   }
+   
 }
 
 function fillCircArr(cirArr){
@@ -55,6 +87,7 @@ function fillCircArr(cirArr){
         false,
         false,
         timeTillHeal);
+        infectedArr.push(cirArr[i]);
       } else{
       cirArr[i] = new circle(Math.random()*canvas.width, 
       Math.random()*canvas.height, 
@@ -106,34 +139,70 @@ function drawManyCircles(cirArr){
     if(cirArr[i].timeTillHeal <= 0){
         if(Math.random() <= deathRate){
             cirArr.splice(i, 1);
+            numDead++;
+            numAlive--;
+            infectedArr.shift();
         }else{
             cirArr[i].immune = true;
             cirArr[i].infected = false;
             cirArr[i].timeTillHeal = 10000;
+            numImmune++
+            infectedArr.shift();
+            
         }
-    }
+    } 
 
     
     cirArr[i].x += cirArr[i].dx;
     cirArr[i].y += cirArr[i].dy;
+
+
     for(let j = 0; j < cirArr.length; j++){
         if(i == j){
             continue;
         }
         if(collision(cirArr[i], cirArr[j])){
-            if(cirArr[i].infected || cirArr[j].infected && cirArr[i].immune == false && cirArr[j].immune == false){
-                if(Math.random() < chanceOfInfec){
-                    cirArr[i].infected = true;
-                    cirArr[j].infected = true;
-
+            if(cirArr[i].infected || cirArr[j].infected){ 
+                if(!cirArr[i].immune && !cirArr[j].immune){                  
+                    if(Math.random() < chanceOfInfec){
+                      if(cirArr[i].infected){
+                        cirArr[j].infected = true;
+                        
+                        let matchj = false;
+                        for(let k = 0; k < infectedArr.length; k++){
+                             if(infectedArr[k] == cirArr[j]){
+                                matchj = true;
+                                break;
+                             }            
+                        } if(!matchj){
+                            infectedArr.push(cirArr[j]);
+                            
+                        }
+                      } else{
+                        cirArr[i].infected = true;
+                        
+                        let matchi = false;
+                        for(let l = 0; l < infectedArr.length; l++){
+                             if(infectedArr[l] == cirArr[i]){
+                                matchi = true;
+                                break;
+                             }                           
+                        } if(!matchi){
+                            infectedArr.push(cirArr[i]);
+                            
+                        }
+                      }
+                    }
                 }
-            }
-
+            }      
         }
-    }  
+      }  
+   
     } 
    
 }
+
+
 
 function collision(cir1, cir2) {
     let a;
@@ -151,21 +220,34 @@ function collision(cir1, cir2) {
     }
   }
 
-// function collide(cir1, cir2){
-//     cir1.dx *= -1;
-//     cir1.dy *= -1;
-//     cir2.dx *= -1;
-//     cir2.dy *= -1;
-// }
+  
 
 
 function draw(){
+   
     ctx.clearRect(0,0,canvas.width, canvas.height);
     drawManyCircles(circles);
+
+    ctx.font = "30px Arial";
+    ctx.fillStyle = "green";
+    ctx.fillText("Number alive: " + numAlive, 20, 30);
+    // ctx.font = "30px Arial";
+    // ctx.fillStyle = "green";
+    ctx.fillText("Number Infected: " + infectedArr.length, 20, 30*2);
+    // ctx.font = "30px Arial";
+    // ctx.fillStyle = "green";
+    ctx.fillText("Number unInfected: " + (circles.length - infectedArr.length - numImmune), 20, 30*3);
+    // ctx.font = "30px Arial";
+    // ctx.fillStyle = "green";
+    ctx.fillText("Number Immune: " + numImmune, 20, 30*4);
+    // ctx.font = "30px Arial";
+    // ctx.fillStyle = "green";
+    ctx.fillText("Number Dead: " + numDead, 20, 30*5);
+    // ctx.font = "30px Arial";
+    // ctx.fillStyle = "green";
+    // ctx.fillText("R Naught: "  + 5 , 20, 30*6);
 
 }
 
 
 
-
- 
