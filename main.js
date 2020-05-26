@@ -1,8 +1,6 @@
 const canvas = document.getElementById('Canvas');
 const ctx = canvas.getContext('2d');
 
-// canvas.width = window.innerWidth - 20;
-// canvas.height = window.innerHeight - 20;
 
 canvas.width = 1240;
 canvas.height = 700;
@@ -23,11 +21,6 @@ let numDead = 0;
 let numHealthy;
 
 let infectedArr = [];
-
-
-
-
-
 
 
 function circle(x, y , radius, dx, dy, infected, immune, dead, timeTillHeal){
@@ -103,36 +96,18 @@ function fillCircArr(cirArr){
 }
 
 function drawManyCircles(cirArr){
+    let colour = "red";
     for(let i = 0; i< cirArr.length; i++){
         if(cirArr[i].immune){
-            ctx.beginPath();
-            ctx.fillStyle = "yellow";
-            ctx.arc(cirArr[i].x, cirArr[i].y, cirArr[i].radius, 0, Math.PI*2, true);
-            ctx.fill(); 
-            ctx.closePath();
+           drawCircle("yellow", cirArr[i]);
         }else if(cirArr[i].infected){
-            ctx.beginPath();
-            ctx.fillStyle = "red";
-            ctx.arc(cirArr[i].x, cirArr[i].y, cirArr[i].radius, 0, Math.PI*2, true);
-            ctx.fill(); 
-            ctx.closePath();
+            drawCircle("red", cirArr[i]);
         } else {
-        ctx.beginPath();
-        ctx.fillStyle = "black";          
-        ctx.arc(cirArr[i].x, cirArr[i].y, cirArr[i].radius, 0, Math.PI*2, true);
-        ctx.fill(); 
-        ctx.closePath(); 
+            drawCircle("black", cirArr[i]);
     }
-        if (cirArr[i].x + cirArr[i].radius >= canvas.width || cirArr[i].x - cirArr[i].radius <= 0){
-            cirArr[i].dx *= -1;
 
-        }
+        edgeDetect(cirArr[i]);
         
-    if (cirArr[i].y + cirArr[i].radius >= canvas.height || cirArr[i].y <= 0){ 
-        cirArr[i].dy *= -1;
-             
-    } 
-   
     if(cirArr[i].infected){
         cirArr[i].timeTillHeal--; 
     }
@@ -152,22 +127,21 @@ function drawManyCircles(cirArr){
         }
     } 
 
-    
-    cirArr[i].x += cirArr[i].dx;
-    cirArr[i].y += cirArr[i].dy;
 
 
     for(let j = 0; j < cirArr.length; j++){
+        if (collision(cirArr[i], cirArr[j]))
+            console.log("hit");
         if(i == j){
             continue;
         }
+        
         if(collision(cirArr[i], cirArr[j])){
             if(cirArr[i].infected || cirArr[j].infected){ 
                 if(!cirArr[i].immune && !cirArr[j].immune){                  
                     if(Math.random() < chanceOfInfec){
                       if(cirArr[i].infected){
-                        cirArr[j].infected = true;
-                        
+                        cirArr[j].infected = true;                      
                         let matchj = false;
                         for(let k = 0; k < infectedArr.length; k++){
                              if(infectedArr[k] == cirArr[j]){
@@ -175,12 +149,10 @@ function drawManyCircles(cirArr){
                                 break;
                              }            
                         } if(!matchj){
-                            infectedArr.push(cirArr[j]);
-                            
+                            infectedArr.push(cirArr[j]);      
                         }
                       } else{
-                        cirArr[i].infected = true;
-                        
+                        cirArr[i].infected = true;               
                         let matchi = false;
                         for(let l = 0; l < infectedArr.length; l++){
                              if(infectedArr[l] == cirArr[i]){
@@ -189,31 +161,44 @@ function drawManyCircles(cirArr){
                              }                           
                         } if(!matchi){
                             infectedArr.push(cirArr[i]);
-                            
+                                }
+                            }
                         }
-                      }
                     }
-                }
-            }      
-        }
-      }  
-   
-    } 
+                }      
+            }
+         }   
+     } 
    
 }
 
+function edgeDetect(circle){
+    if (circle.x + circle.radius >= canvas.width || circle.x - circle.radius <= 0){
+        circle.dx *= -1;
+    }
+    
+    if (circle.y + circle.radius >= canvas.height || circle.y <= 0){ 
+    circle.dy *= -1;         
+    } 
+    circle.x += circle.dx;
+    circle.y += circle.dy;
+}
+
+function drawCircle(colour, circle){
+    ctx.beginPath();
+    ctx.fillStyle = colour;
+    ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI*2, true);
+    ctx.fill(); 
+    ctx.closePath();
+}
 
 
 function collision(cir1, cir2) {
-    let a;
-    let x;
-    let y;
+    let c = cir1.radius*2;
+    let x = cir1.x - cir2.x;
+    let y = cir1.y - cir2.y;
   
-    a = cir1.radius*2;
-    x = cir1.x - cir2.x;
-    y = cir1.y - cir2.y;
-  
-    if (a > Math.sqrt((x * x) + (y * y))) {
+    if (c > Math.sqrt((Math.pow(x,2)) + (Math.pow(y,2)))) {
       return true;
     } else {
       return false;
